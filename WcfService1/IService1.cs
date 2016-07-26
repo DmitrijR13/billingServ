@@ -21,7 +21,7 @@ namespace ServiceFromBill
 
         [WebGet(ResponseFormat = WebMessageFormat.Xml)]
         [OperationContract]
-        List<ЛицевойСчет> GetFactura(String db, Int32 m, Int32 y);
+        List<ЛицевойСчет> GetFactura(String db, Int32 m, Int32 y, Int32 part, Int32 numLs = 0);
 
         //[OperationContract]
         //void LoadForGis(String db, Int32 year, Int32 month);
@@ -158,6 +158,12 @@ namespace XmlClass
     {
         public String Всего { get; set; }
         public ЗаКоммульныеУслуги ЗаКоммульныеУслуги { get; set; }
+
+        public ИтогоКОплате()
+        {
+            Всего = "";
+            ЗаКоммульныеУслуги = new ЗаКоммульныеУслуги();
+        }
     }
 
     public class ЗаКоммульныеУслуги

@@ -8,6 +8,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <LastUsedBuildConfiguration>Release</LastUsedBuildConfiguration>
     <LastUsedPlatform>Any CPU</LastUsedPlatform>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>C:\Users\DmitrijR\Desktop\publishSerbForBill</_PublishTargetUrl>
   </PropertyGroup>
   <ItemGroup>
     <File Include="bin/ClosedXML.dll">
@@ -22,8 +23,23 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="bin/Npgsql.dll">
       <publishTime>04/30/2014 12:46:14</publishTime>
     </File>
+    <File Include="bin/Oracle.DataAccess.dll">
+      <publishTime>08/31/2012 17:21:26</publishTime>
+    </File>
     <File Include="bin/ServiceFromBill.dll">
-      <publishTime>03/16/2016 13:41:28</publishTime>
+      <publishTime>07/01/2016 14:11:21</publishTime>
+    </File>
+    <File Include="oci.dll">
+      <publishTime>03/17/2016 17:11:33</publishTime>
+    </File>
+    <File Include="orannzsbb11.dll">
+      <publishTime>03/17/2016 17:11:33</publishTime>
+    </File>
+    <File Include="oraociei11.dll">
+      <publishTime>03/17/2016 17:11:39</publishTime>
+    </File>
+    <File Include="OraOps11w.dll">
+      <publishTime>03/17/2016 17:11:39</publishTime>
     </File>
     <File Include="packages.config">
       <publishTime>01/10/2014 16:33:48</publishTime>
@@ -32,7 +48,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>03/15/2016 14:24:52</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>03/16/2016 13:41:28</publishTime>
+      <publishTime>06/30/2016 16:54:53</publishTime>
     </File>
   </ItemGroup>
 </Project>
