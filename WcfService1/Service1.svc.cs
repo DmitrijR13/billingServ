@@ -7,6 +7,7 @@ using System.IO;
 using Npgsql;
 using XmlClass;
 using System.Linq;
+using System.Configuration;
 
 namespace ServiceFromBill
 {
@@ -57,6 +58,12 @@ namespace ServiceFromBill
                     break;
                 case "billtlt":
                     database = "billTlt";
+                    break;
+                case "radelit":
+                    database = "RadElit";
+                    break;
+                case "kinel":
+                    database = "kinel";
                     break;
                 default:
                     database = "billTlt";
@@ -226,7 +233,25 @@ namespace ServiceFromBill
 
         public List<ЛицевойСчет> GetFactura(String db, Int32 m, Int32 y, Int32 part, Int32 numLs = 0)
         {
-            string connStr = "Server=localhost;Database=" + db + ";User ID=postgres;Password=Admin;CommandTimeout=180000;";
+            switch (db.ToLower())
+            {
+                case "billauk":
+                    db = "billAuk";
+                    break;
+                case "billtlt":
+                    db = "billTlt";
+                    break;
+                case "radelit":
+                    db = "RadElit";
+                    break;
+                case "kinel":
+                    db = "kinel";
+                    break;
+                default:
+                    db = "billTlt";
+                    break;
+            }
+            string connStr = ConfigurationManager.ConnectionStrings[db].ConnectionString;
             //StreamWriter sw = new StreamWriter(@"C:\Temp\facturaLog.txt", true);
             conn = new NpgsqlConnection(connStr);
             conn.Open();
@@ -244,34 +269,42 @@ namespace ServiceFromBill
                 CreateFselKvar(db);
                 if (numLs == 0)
                 {
-                    switch (part)
+                    if(db == "kinel")
                     {
-                        case 1:
-                            {
-                                whereDom = "30913,30900,49,30902,48,47,30912,30901,46,30904,30903,30899,30895,30893,30898,30892,44,30737,30896,30888,30753,7155100,7155101,30905,30890,30889,30880,30878,30831,30881,51";
-                                break;
-                            }
-                        case 2:
-                            {
-                                whereDom = "45,7154259,30988,30879,7155104,30685,230003,7155107";
-                                break;
-                            }
-                        case 3:
-                            {
-                                whereDom = "7155108,30886,7155103,30883,7155106,7154254,52";
-                                break;
-                            }
-                        case 4:
-                            {
-                                whereDom = "7155102,7154256,30978,30884,30897,230001";
-                                break;
-                            }
-                        case 5:
-                            {
-                                whereDom = "30885,7154109,7154257,7155105,7154590";
-                                break;
-                            }
+                        whereDom = "SELECT nzp_dom FROM fbill_data.dom";
                     }
+                    else
+                    {
+                        switch (part)
+                        {
+                            case 1:
+                                {
+                                    whereDom = "30913,30900,49,30902,48,47,30912,30901,46,30904,30903,30899,30895,30893,30898,30892,44,30737,30896,30888,30753,7155100,7155101,30905,30890,30889,30880,30878,30831,30881,51";
+                                    break;
+                                }
+                            case 2:
+                                {
+                                    whereDom = "45,7154259,30988,30879,7155104,30685,230003,7155107";
+                                    break;
+                                }
+                            case 3:
+                                {
+                                    whereDom = "7155108,30886,7155103,30883,7155106,7154254,52";
+                                    break;
+                                }
+                            case 4:
+                                {
+                                    whereDom = "7155102,7154256,30978,30884,30897,230001";
+                                    break;
+                                }
+                            case 5:
+                                {
+                                    whereDom = "30885,7154109,7154257,7155105,7154590";
+                                    break;
+                                }
+                        }
+                    }
+                    
                     FillFselKvar(db, whereDom);
                 }
                 else
@@ -330,8 +363,18 @@ namespace ServiceFromBill
                     раздел1.Приватизирована = kvarPrm.Rows[0]["privat"] != null && kvarPrm.Rows[0]["privat"].ToString() != "" ? "Да" : "Нет";
                     раздел1.НомерЛС = part1.Rows[i]["num_ls"].ToString();
                     раздел1.ФИО = part1.Rows[i]["fio"].ToString();
-                    раздел1.АдресПомещения = kvarPrm.Rows[0]["indecs"].ToString() + ", г. Самара, "
+                    if(db == "kinel")
+                    {
+                        раздел1.АдресПомещения = kvarPrm.Rows[0]["indecs"].ToString() + ", " + part1.Rows[i]["town"].ToString() + ", " 
+                            + part1.Rows[i]["rajon"].ToString() + ", " + part1.Rows[i]["ulica"].ToString() + "," 
+                            + part1.Rows[i]["ndom"].ToString() + "-" + part1.Rows[i]["nkvar"].ToString();
+                    }
+                    else
+                    {
+                        раздел1.АдресПомещения = kvarPrm.Rows[0]["indecs"].ToString() + ", г. Самара, "
                         + part1.Rows[i]["ulica"].ToString() + "," + part1.Rows[i]["ndom"].ToString() + "-" + part1.Rows[i]["nkvar"].ToString();
+                    }
+                    
                     
                     раздел1.ПрописаноПроживает = kvarPrm.Rows[0]["count_gil"].ToString() != ""
                         ? kvarPrm.Rows[0]["count_gil"].ToString() : "0" + "/" + kvarPrm.Rows[0]["count_gilp"].ToString() != ""
@@ -3541,6 +3584,12 @@ AND nzp_kvar in (SELECT nzp_kvar FROM t_fkvar_prm WHERE is_open = 1 )  ORDER BY 
                 case "billtlt":
                     database = "billTlt";
                     break;
+                case "radelit":
+                    database = "RadElit";
+                    break;
+                case "kinel":
+                    database = "kinel";
+                    break;
                 default:
                     database = "billTlt";
                     break;
@@ -3855,7 +3904,7 @@ AND nzp_kvar in (SELECT nzp_kvar FROM t_fkvar_prm WHERE is_open = 1 )  ORDER BY 
         {
             string connStr = "Server=192.168.1.25;Database=" + database + ";User ID=postgres;Password=Admin;CommandTimeout=180000;";
             //string connStr = "Server=192.168.1.25;Database=" + database + ";User ID=postgres;Password=Admin;CommandTimeout=180000;";
-            string cmdText = @"SELECT ul.ulica || ', д.' || d.ndom || ' кв.'|| k.nkvar, k.fio, " + (database == "billAuk" ? "k.num_ls" : "k.pkod") +
+            string cmdText = @"SELECT ul.ulica || ', д.' || d.ndom || ' кв.'|| k.nkvar, k.fio, " + (database == "billAuk" ? "k.num_ls" : database == "RadElit" ? "k.pkod10" : "k.pkod") +
                                 @", s.service, c.nzp_counter, c.num_cnt,
                                 CASE WHEN Extract(month from dat_uchet) - 1 = 0 THEN 12 ELSE Extract(month from dat_uchet) - 1 END as month,
                                 c.val_cnt,
@@ -3878,7 +3927,7 @@ AND nzp_kvar in (SELECT nzp_kvar FROM t_fkvar_prm WHERE is_open = 1 )  ORDER BY 
                 da.Fill(dt);
                 return dt;
             }
-            catch
+            catch(Exception e)
             {
                 return null;
             }
@@ -3920,8 +3969,7 @@ AND nzp_kvar in (SELECT nzp_kvar FROM t_fkvar_prm WHERE is_open = 1 )  ORDER BY 
 
             if (yearFrom == yearTo)
             {
-                
-                cmdText = @"SELECT k.num_ls, k.pkod, sum(pl.g_sum_ls) as g_sum_ls, to_char(pl.dat_vvod, 'dd-mm-yyyy') as dat_vvod,  b.bank as bank
+                cmdText = @"SELECT " + (database == "RadElit" ? "k.pkod10" : "k.num_ls") + @", k.pkod, sum(pl.g_sum_ls) as g_sum_ls, to_char(pl.dat_vvod, 'dd-mm-yyyy') as dat_vvod,  b.bank as bank
                                 FROM fbill_fin_" + (yearFrom - 2000).ToString("00") + @".pack_ls pl 
                                 INNER JOIN fbill_fin_" + (yearFrom - 2000).ToString("00") + @".pack p on p.nzp_pack = pl.nzp_pack 
                                 INNER JOIN fbill_kernel.s_bank b on b.nzp_bank = p.nzp_bank 
@@ -3937,7 +3985,7 @@ AND nzp_kvar in (SELECT nzp_kvar FROM t_fkvar_prm WHERE is_open = 1 )  ORDER BY 
                     if (i != yearFrom)
                         cmdText += " UNION ALL ";
 
-                    cmdText += @" SELECT k.num_ls, k.pkod, sum(pl.g_sum_ls) as g_sum_ls, to_char(pl.dat_vvod, 'dd-mm-yyyy') as dat_vvod,  b.bank as bank
+                    cmdText += @" SELECT " + (database == "RadElit" ? "k.pkod10" : "k.num_ls") + @", k.pkod, sum(pl.g_sum_ls) as g_sum_ls, to_char(pl.dat_vvod, 'dd-mm-yyyy') as dat_vvod,  b.bank as bank
                             FROM fbill_fin_" + (i - 2000).ToString("00") + @".pack_ls pl 
                             INNER JOIN fbill_fin_" + (i - 2000).ToString("00") + @".pack p on p.nzp_pack = pl.nzp_pack 
                             INNER JOIN fbill_kernel.s_bank b on b.nzp_bank = p.nzp_bank 
